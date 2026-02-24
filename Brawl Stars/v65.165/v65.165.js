@@ -22,16 +22,17 @@ const PepperKiller = {
         Interceptor.attach(base.add(0xB1798C), { // Messaging::sendPepperAuthentication
             onEnter(args) {
                 this.messaging = args[0];
-                this.messaging.add(24);
-                console.warn("[+][PepperState::State][1] Pepper State Is", Memory.readU32(this.messaging.add(24)));
-                Memory.writeU32(this.messaging.add(24), 5);
+                const ptr = this.messaging.add(24);
+                console.warn("[+][PepperState::State][1] Pepper State Is", ptr.readU32(this.messaging.add(24)));
+                ptr.writeU32(this.messaging.add(24), 5);
                 args[1] = args[2];
-                console.warn("[+][PepperState::State][2] Pepper State Is", Memory.readU32(this.messaging.add(24)));
+                console.warn("[+][PepperState::State][2] Pepper State Is", ptr.readU32(this.messaging.add(24)));
 
             },
             onLeave(retval) {
-                Memory.writeU32(this.messaging.add(24), 5);
-                console.warn("[+][PepperState::State][3] Pepper State Is", Memory.readU32(this.messaging.add(24)));
+                const ptr = this.messaging.add(24);
+                ptr.writeU32(this.messaging.add(24), 5);
+                console.warn("[+][PepperState::State][3] Pepper State Is", ptr.readU32(this.messaging.add(24)));
             }
         });
         Interceptor.attach(base.add(0xB18538), function() { // Messaging::encryptAndWrite
