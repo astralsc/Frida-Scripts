@@ -25,7 +25,7 @@ const PepperKiller = {
                 const ptr = this.messaging.add(24);
                 console.warn("[+][PepperState::State][1] Pepper State Is", ptr.readU32(this.messaging.add(24)));
                 ptr.writeU32(5);
-                args[1] = args[2]; // CRASH
+                //args[1] = args[2]; // CRASH
                 console.warn("[+][PepperState::State][2] Pepper State Is", ptr.readU32(this.messaging.add(24)));
 
             },
