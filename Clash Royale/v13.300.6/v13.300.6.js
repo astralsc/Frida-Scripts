@@ -8,6 +8,8 @@ const loadoffset = 0x1111E58;
 const addr = base.add(loadoffset);
 const original = addr.readByteArray(4);
 
+const fMessaging_Send = new NativeFunction(base.add(0x1108514), "void", ["pointer", "pointer"]);
+
 const PepperKiller = {
     init() {
         try {
@@ -17,28 +19,28 @@ const PepperKiller = {
             }, 'int', []));
         }
         catch (e) {
-            console.warn("[+] PepperCrypto::secretbox_open is already skipped! ", e)
+            console.warn("[+] PepperCrypto::secretbox_open is already skipped!", e);
         }
-        Interceptor.attach(base.add(0x1109630), { // Messaging::sendPepperAuthentication
-            onEnter(args) {
-                this.messaging = args[0];
-                const ptr = this.messaging.add(24);
-                console.warn("[+][PepperState::State][1] Pepper State Is", ptr.readU32(this.messaging.add(24)));
-                ptr.writeU32(5);
-                //args[1] = args[2]; // CRASH
-                console.warn("[+][PepperState::State][2] Pepper State Is", ptr.readU32(this.messaging.add(24)));
 
-            },
-            onLeave(retval) {
-                const ptr = this.messaging.add(24);
-                ptr.writeU32(5);
-                console.warn("[+][PepperState::State][3] Pepper State Is", ptr.readU32(this.messaging.add(24)));
-            }
-        });
-        Interceptor.attach(base.add(0x110A034), function() { // Messaging::encryptAndWrite
-            this.context.w0 = this.context.w8; // not tested
-            console.warn("[+][PepperCrypto::secretbox_open] Skipped encryption");
-        });
+        try {
+            Interceptor.replace(base.add(0x94c810), new NativeCallback(function() {
+                console.warn("[+][sub_94C810] Skipped");
+            }, "void", []));
+        }
+        catch (e) {
+            console.warn("[+] sub_94C810 is already skipped!", e);
+        }
+
+        try {
+            Interceptor.replace(base.add(0x1109630), new NativeCallback(function(a1, a2) {
+                console.warn("[+][Messaging::sendPepperAuthentication] Replaced â€” forcing pepper state to 5");
+                a1.add(24).writeU8(5);
+                fMessaging_Send(a1, a2);
+            }, "pointer", ["pointer", "pointer"]));
+        }
+        catch (e) {
+            console.warn("[+] sendPepperAuthentication is already replaced!", e);
+        }
     }
 }
 
@@ -51,9 +53,9 @@ Interceptor.attach(getaddrinfo, {
 
         // Initialization
         {
-            PepperKiller.init()
+            PepperKiller.init();
         }
-        
+
         Memory.protect(addr, 0x1000, 'rwx');
         addr.writeByteArray(original);
 
