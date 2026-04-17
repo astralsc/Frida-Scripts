@@ -1,5 +1,5 @@
 {
-const Host = '192.168.1.109';
+const Host = '127.0.0.1';
 const Port = '9339';
 
 Interceptor.attach(Process.getModuleByName("libc.so").findExportByName('getaddrinfo'), {
