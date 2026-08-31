@@ -1,3 +1,9 @@
+/*
+GD World 2.2.11 Unlock Guide:
+all of "3B 00 80 52 BF AF" needs to be replaced with "1F 20 03 2A BF AF"
+all of "38 00 80 52 94" needs to be replaced with "18 00 80 52 94"
+*/
+
 var base = Process.getModuleByName("libcocos2dcpp.so").base;
 
 // This script basically replaces the world level screen with the normal GD level screen
